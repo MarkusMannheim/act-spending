@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-155991615-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "UA-155991615-1");
+    </script>
+    <!-- my stuff -->
+    <meta charset="utf-8">
+    <title>ACT Government spending</title>
+    <meta name="description" content="How the Barr Government spent money over the four years in 2020.">
+    <meta name="keywords" content="act, election, budget, spending, canberra, health, education, safety, culture, transport">
+    <meta name="author" content="Markus Mannheim">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <link href="./resources/widgetStyle.css" rel="stylesheet">
+    <link href="./resources/abcLogo64.png" rel="icon">
+  </head>
+  <body>
+    <!-- initial layout -->
+    <div id="container">
+      <div id="summary">
+        <div id="arrow"></div>
+        <div id="change"></div>
+      </div>
+      <div id="text">
+        <div id="sector"></div>
+        <div id="label">annual spending per person (today's dollars): <span>$0</span></div>
+      </div>
+    </div>
+    <script>
+      // load data
+      d3.csv("./resources/widgetData.csv", function(error, data) {
+        if (error) throw error;
+        // format data
+        query = window.location.search;
+        sector = query.slice(query.lastIndexOf("?") + 1);
+        data = data
+          .filter(function(d) { return d.sector == sector; })
+          .map(function(d) {
+            d.change = +d.change;
+            d.amount = +d.amount;
+            return d;
+          })[0];
+        d3.select("#summary")
+          .classed("negative", data.change < 0);
+        d3.select("#arrow")
+          .html(function() { return data.change < 0 ? "&#8600;" : "&#8599;"; });
+        d3.select("#change")
+          .text(d3.format(".1%")(data.change));
+        d3.select("#sector")
+          .text(data.full);
+        d3.select("#label span")
+          .text(d3.format("$,.0f")(data.amount));
+
+      });
+    </script>
+  </body>
+</html>

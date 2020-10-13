@@ -1,0 +1,92 @@
+/* colours
+blue: #009CBF
+orange: #F75F00
+green: #00A388
+--tint-1: #333;
+--tint-2: #666;
+--tint-3: #999;
+--tint-4: #ccc;
+--tint-5: #e6e6e6;
+--tint-6: #f2f2f2;
+ */
+@font-face {
+  font-family: "ABCSans Regular";
+  font-style: normal;
+  font-weight: normal;
+  src: local("ABCSans Regular"), url("./abcsans-regular.woff") format("woff");
+}
+@font-face {
+  font-family: "ABCSans Black";
+  font-style: normal;
+  font-weight: normal;
+  src: local("ABCSans Black"), url("./abcsans-black.woff") format("woff");
+}
+@font-face {
+  font-family: "ABCSans Light";
+  font-style: normal;
+  font-weight: normal;
+  src: local("ABCSans Light"), url("./abcsans-light.woff") format("woff");
+}
+:root {
+  font-size: 1em;
+  font-family: "ABCSans Black", "Arial Black", sans-serif;
+  color: #333;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+}
+#container {
+  display: flex;
+  align-items: center;
+}
+#summary {
+  display: flex;
+  margin-right: 1rem;
+  color: #00A388;
+}
+#summary.negative {
+  color: #F75F00;
+}
+#arrow {
+  font-weight: bold;
+  font-size: 1.75rem;
+  margin-right: .5rem;
+  line-height: 75px;
+}
+#change {
+  font-size: 1.75rem;
+  line-height: 75px;
+}
+#sector {
+  font-size: 1.75rem;
+  color: #666;
+}
+#label {
+  font-family: "ABCSans Light", "Arial Narrow", sans-serif;
+  font-size: .8rem;
+  color: #666;
+}
+span {
+  font-family: "ABCSans Black", "Arial Black", sans-serif;
+  color: #999;
+}
+h1, p {
+  margin: 0;
+}
+@media only screen and (min-width: 500px) {
+  #arrow {
+    font-size: 2rem;
+    line-height: 60px;
+  }
+  #change {
+    font-size: 2rem;
+    line-height: 60px;
+  }
+  #sector {
+    font-size: 2rem;
+  }
+  #label {
+    font-size: .9rem;
+  }
+}
