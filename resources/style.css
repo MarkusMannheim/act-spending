@@ -33,56 +33,66 @@ body {
 #container {
   position: fixed;
   top: 0;
-  bottom: .5rem;
   left: 0;
   right: 0;
+  bottom: 0;
   display: flex;
   flex-flow: column;
 }
 h1, p {
   margin: 0;
 }
-#title {
-  font-family: "ABCSans Black", "Arial Black", sans-serif;
-}
 #description {
   font-size: .9rem;
-  color: #666;
+  margin-bottom: 1rem;
 }
 #key {
   display: flex;
-  justify-content: flex-start;
+  flex-flow: wrap;
   font-weight: bold;
-  margin: 1rem 0;
+  margin-bottom: .5rem;
+}
+.keyPair {
+  display: flex;
+  font-size: .9rem;
+  margin: 0 1rem .5rem 0;
 }
 .box {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-right: .5rem;
-  background-color: #009CBF;
-  box-shadow: 1px 1px 3px #333;
-}
-#plot2016, .point2016 {
-  stroke: #009CBF;
+  width: 1rem;
+  height: 1rem;
+  margin-right: .25rem;
+  box-shadow: 1px 1px 2px #333;
 }
 .key {
-  line-height: 1.25rem;
-}
-.key:nth-child(2) {
-  margin-right: 1rem;
-}
-.box:nth-child(3) {
-  background-color: #F75F00;
-}
-#plot2020, .point2020 {
-  stroke: #F75F00;
+  line-height: 1rem;
 }
 #chart {
   width: 100%;
   height: 100%;
 }
-.axis {
-  opacity: 0;
+.health {
+  fill: #009CBF;
+  background-color: #009CBF;
+}
+.education {
+  fill: #F75F00;
+  background-color: #F75F00;
+}
+.safety {
+  fill: #00A388;
+  background-color: #00A388;
+}
+.transport {
+  fill: #FFB300;
+  background-color: #FFB300;
+}
+.culture {
+  fill: #248BC9;
+  background-color: #248BC9;
+}
+.other {
+  fill: #ccc;
+  background-color: #ccc;
 }
 .domain, .tick line {
   stroke: #999;
@@ -92,23 +102,7 @@ h1, p {
 }
 .tick text {
   fill: #333;
-  font-size: .7rem;
-}
-#label {
-  fill: #333;
-  font-size: .8rem;
-  text-anchor: middle;
-}
-.plot {
-  stroke-width: 4;
-  fill: none;
-  stroke-linecap: round;
-  clip-path: url(#chartClip);
-}
-.point {
-  stroke-width: 2;
-  fill: white;
-  clip-path: url(#chartClip);
+  font-size: .75rem;
 }
 @media only screen and (min-width: 500px) {
   #title {

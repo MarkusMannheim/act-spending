@@ -11,9 +11,9 @@
     </script>
     <!-- my stuff -->
     <meta charset="utf-8">
-    <title>ACT pre-poll votes</title>
-    <meta name="description" content="Daily pre-poll votes cast in the 2020 ACT Election.">
-    <meta name="keywords" content="act, election, prepoll, votes, 2020, canberra, voters, ballot, poll">
+    <title>ACT Government spending</title>
+    <meta name="description" content="How the Barr Government spent money over the four years in 2020.">
+    <meta name="keywords" content="act, election, actvotes, actvotes2020, budget, government, spending, canberra, andrew, barr">
     <meta name="author" content="Markus Mannheim">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -23,94 +23,75 @@
   <body>
     <!-- initial layout -->
     <div id="container">
-      <div id="title">Early voting in the ACT election</div>
-      <div id="description">Accumulated pre-poll votes as % of enrolment:</div>
-      <div id="key">
-        <div class="box"></div>
-        <div class="key">2016</div>
-        <div class="box"></div>
-        <div class="key">2020</div>
-      </div>
+      <div id="description">ACT Government spending per capita in today's dollars (2020):</div>
+      <div id="key"></div>
       <svg id="chart">
-        <defs>
+        <!-- <defs>
           <clipPath id="chartClip">
             <rect></rect>
           </clipPath>
-        </defs>
-        <g id="xAxisGroup" class="axis">
-          <text id="label" x="0" y="35">days until election</text>
-        </g>
-        <g id="yAxisGroup" class="axis"></g>
+        </defs> -->
         <g id="chartGroup"></g>
+        <g id="xAxisGroup" class="axis"></g>
+        <g id="yAxisGroup" class="axis"></g>
       </svg>
     </div>
     <script>
       // load data
-      d3.csv("./resources/data.csv?randomKey=" + Math.floor(Math.random() * 9000) + 1000, function(error, data) {
+      d3.csv("./resources/spending.csv", function(error, data) {
         if (error) throw error;
         // format data
-        voteData = data
+        columns = data.columns.slice(1);
+        spendingData = data
           .map(function(d) {
-            for (column in data.columns) {
-              if (data.columns[column] !== "day") d[data.columns[column]] = +d[data.columns[column]];
+            d.year = new Date(d.year + "/06/30");
+            for (i in columns) {
+              d[columns[i]] = +d[columns[i]];
             }
-            d.pc2016 = d["2016"] / 283162;
-            d.pc2020 = d["2020"] / 302628;
             return d;
           });
-        voteData.forEach(function(d, i) {
-          d.pc2016 = d["2016"] / 283162 + (i > 0 ? voteData[i - 1].pc2016: 0);
-          d.pc2020 = d["2020"] / 302628 + (i > 0 ? voteData[i - 1].pc2020: 0);
-        });
         // page elements
         xAxisGroup = d3.select("#xAxisGroup");
         yAxisGroup = d3.select("#yAxisGroup");
         chartGroup = d3.select("#chartGroup");
         chart = d3.select("#chart");
         chartClip = d3.select("#chartClip");
+        key = d3.select("#key");
+        keyPairs = key
+          .selectAll(".keyPair")
+            .data(data.columns.slice(1))
+          .enter().append("div")
+            .classed("keyPair", true);
+        keyPairs.append("div")
+          .attr("class", function(d) { return "box " + d; });
+        keyPairs.append("div")
+          .classed("key", true)
+          .text(function(d) { return d.toUpperCase(); });
         // draw chart
         window.addEventListener("resize", resize);
-        d3.timeout(function() {
-          prepareChart();
-        }, 1000);
+        prepareChart();
       });
       function prepareChart() {
-        x = d3.scaleLinear()
-          .domain([19, 0]);
+        stackData = d3.stack()
+          .keys(columns)(spendingData);
+        x = d3.scaleTime()
+          .domain(d3.extent(stackData[0], function(d) { return d.data.year; }));
         y = d3.scaleLinear()
-         .domain([0, d3.max(voteData, function(d) { return d3.max([d.pc2016, d.pc2020]); })]).nice();
+         .domain([0, d3.max(stackData[columns.length - 1], function(d) { return d[1]; })]).nice();
         xAxis = d3.axisBottom(x)
-          .tickSizeOuter(0)
-          .tickPadding(8);
+          .tickSizeOuter(0);
         yAxis = d3.axisLeft(y)
-          .tickSizeOuter(0)
-          .tickPadding(8);
-        line2016 = d3.line()
-          .x(function(d) { return x(+d.day); })
-          .y(function(d) { return y(d.pc2016); });
-        line2020 = d3.line()
-          .x(function(d) { return x(+d.day); })
-          .y(function(d) { return y(d.pc2020); });
-        plot2016 = chartGroup
-          .append("path")
-            .attr("id", "plot2016")
-            .classed("plot", true);
-        points2016 = chartGroup
-          .selectAll(".point2016")
-            .data(voteData.filter(function(d) { return !isNaN(d.pc2016); }))
-          .enter().append("circle")
-            .classed("point", true)
-            .classed("point2016", true);
-        plot2020 = chartGroup
-          .append("path")
-            .attr("id", "plot2020")
-            .classed("plot", true);
-        points2020 = chartGroup
-          .selectAll(".point2020")
-            .data(voteData.filter(function(d) { return !isNaN(d.pc2020); }))
-          .enter().append("circle")
-            .classed("point", true)
-            .classed("point2020", true);
+          .tickSizeOuter(0);
+        area = d3.area()
+          .x(function(d) { return x(d.data.year); })
+          .y1(function(d) { return y(d[1]); })
+          .y0(function(d) { return y(d[0]); })
+          .curve(d3.curveCardinal)
+        stacks = chartGroup
+          .selectAll(".stack")
+            .data(stackData)
+          .enter().append("path")
+            .attr("class", function(d) { return "stack " + d.key; });
         resize();
       }
       function resize() {
@@ -118,47 +99,17 @@
         width = dimensions.width;
         height = dimensions.height;
         margin = { top: 5, right: 5, bottom: 40, left: 35 };
-        axisTicks = width < 500 ? 4 : 5;
-        xAxis.ticks(axisTicks)
+        xAxis.ticks(5, "%Y")
           .tickSizeInner(margin.top + margin.bottom - height);
-        yAxis.ticks(axisTicks, ".0%")
+        yAxis.ticks(5, "$3s")
           .tickSizeInner(margin.left + margin.right - width);
-        xAxisGroup.attr("transform", "translate(0, " + (height - margin.bottom) + ")");
-        yAxisGroup.attr("transform", "translate(" + (margin.left) + ", 0)");
-        x.range([margin.left, margin.left]);
-        xAxisGroup.call(xAxis);
         x.range([margin.left, width - margin.right]);
-        xAxisGroup.transition()
-          .duration(1000)
-          .style("opacity", 1)
-          .call(xAxis);
-        xAxisGroup.select("#label")
-          .transition()
-            .duration(1000)
-            .attr("x", margin.left + (width - margin.left - margin.right) / 2);
-        y.range([height - margin.bottom, height - margin.bottom]);
-        yAxisGroup.call(yAxis);
+        xAxisGroup.attr("transform", "translate(0, " + (height - margin.bottom) + ")");
+        xAxisGroup.call(xAxis);
         y.range([height - margin.bottom, margin.top]);
-        yAxisGroup.transition()
-          .duration(1000)
-          .style("opacity", 1)
-          .call(yAxis);
-        chartClip.select("rect")
-          .attr("x", 0)
-          .attr("y", 0)
-          .attr("height", height)
-          .attr("width", 0)
-          .transition()
-            .duration(1000)
-            .delay(1000)
-            .attr("width", width);
-        plot2016.attr("d", line2016(voteData.filter(function(d) { return !isNaN(d.pc2016); })));
-        plot2020.attr("d", line2020(voteData.filter(function(d) { return !isNaN(d.pc2020); })));
-        d3.selectAll(".point")
-          .attr("r", 4)
-          .attr("cx", function(d) { return x(+d.day); });
-        points2016.attr("cy", function(d) { return y(d.pc2016); });
-        points2020.attr("cy", function(d) { return y(d.pc2020); });
+        yAxisGroup.attr("transform", "translate(" + (margin.left) + ", 0)");
+        yAxisGroup.call(yAxis);
+        stacks.attr("d", function(d) { return area(d); });
       }
     </script>
   </body>
