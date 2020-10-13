@@ -34,7 +34,7 @@
     </div>
     <script>
       // load data
-      d3.csv("./resources/widgetData.csv", function(error, data) {
+      d3.csv("./resources/widgetData.csv?refresh", function(error, data) {
         if (error) throw error;
         // format data
         query = window.location.search;
