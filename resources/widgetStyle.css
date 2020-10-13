@@ -43,10 +43,21 @@ body {
 #summary {
   display: flex;
   margin-right: 1rem;
+}
+.health {
+  color: #009CBF;
+}
+.education {
+  color: #F75F00;
+}
+.safety {
   color: #00A388;
 }
-#summary.negative {
-  color: #F75F00;
+.transport {
+  color: #FFB300;
+}
+.culture {
+  color: #248BC9;
 }
 #arrow {
   font-weight: bold;
